@@ -1,0 +1,16 @@
+server:
+  port: 28004
+
+spring:
+  application:
+    name: eagel-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.9.166:8848
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
