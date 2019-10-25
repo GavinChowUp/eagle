@@ -8,8 +8,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  * @author Gavin
  * @date 2019/10/22 8:53 下午
  */
-
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.eagle.cloud")
 @EnableDiscoveryClient
 public class GatewayApplication {
     
@@ -18,3 +17,5 @@ public class GatewayApplication {
     }
     
 }
+
+    
