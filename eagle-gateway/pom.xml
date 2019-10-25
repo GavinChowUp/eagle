@@ -4,12 +4,59 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>Eagle</artifactId>
-        <groupId>com.gavin.eagle</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <groupId>com.eagle.cloud</groupId>
+        <version>${eagle.cloud.version}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eagle-gateway</artifactId>
 
+    <dependencies>
+        <!--nacos-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
 
+        <!--web flux-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <!--gatewy-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+
+        <!--监控-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!--eagle-->
+        <dependency>
+            <groupId>com.eagle.cloud</groupId>
+            <artifactId>common-core</artifactId>
+            <version>${eagle.cloud.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <finalName>${project.name}</finalName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

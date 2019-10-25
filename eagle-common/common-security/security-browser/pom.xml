@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>common-security</artifactId>
-        <groupId>com.gavin.eagle</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <groupId>com.eagle.cloud</groupId>
+        <version>${eagle.cloud.version}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.gavin.eagle</groupId>
+    <groupId>com.eagle.cloud</groupId>
     <artifactId>Eagle</artifactId>
     <packaging>pom</packaging>
     <version>${eagle.cloud.version}</version>
@@ -19,18 +19,37 @@
 
     <properties>
         <eagle.cloud.version>0.0.1-SNAPSHOT</eagle.cloud.version>
-        <spring-cloud.version>Finchley.SR1</spring-cloud.version>
+        <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
+        <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
+        <spring-cloud-alibaba.version>2.1.0.RELEASE</spring-cloud-alibaba.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <docker.image.prefix>eagle</docker.image.prefix>
     </properties>
+
+    <dependencies>
+        <!--Lombok-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+    </dependencies>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.spring.platform</groupId>
-                <artifactId>platform-bom</artifactId>
-                <version>Cairo-SR8</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -41,6 +60,14 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -55,16 +82,40 @@
                     <configuration>
                         <finalName>${project.name}</finalName>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>build-info</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
+
                 <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>1.4.10</version>
                     <configuration>
-                        <target>${java.version}</target>
-                        <source>${java.version}</source>
-                        <encoding>UTF-8</encoding>
+                        <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                        <buildArgs>
+                            <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+                        </buildArgs>
                     </configuration>
                 </plugin>
+
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <target>${maven.compiler.target}</target>
+                    <source>${maven.compiler.source}</source>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>

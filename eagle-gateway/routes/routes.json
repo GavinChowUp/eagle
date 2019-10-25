@@ -1,0 +1,25 @@
+// 该 json 为导入 nacos 的标准格式
+// nacos 中要配置 的 dataId 、Group 以 bootstrap.yml 中的 listening 为准
+[
+  {
+    "id": "nacos_route",
+    "predicates": [
+      {
+        "name": "Path",
+        "args": {
+          "_genkey_0": "/nacos/**"
+        }
+      }
+    ],
+    "filters": [
+      {
+        "name": "StripPrefix",
+        "args": {
+          "_genkey_0": "1"
+        }
+      }
+    ],
+    "uri": "lb://eagle-nacos",
+    "order": 0
+  }
+]

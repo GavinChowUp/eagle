@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>Eagle</artifactId>
-        <groupId>com.gavin.eagle</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <groupId>com.eagle.cloud</groupId>
+        <version>${eagle.cloud.version}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -18,5 +18,18 @@
         <module>common-swagger</module>
     </modules>
 
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <finalName>${project.name}</finalName>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
