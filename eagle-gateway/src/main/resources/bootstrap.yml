@@ -19,7 +19,13 @@ spring:
         server-addr: ${spring.cloud.nacos.discovery.server-addr}
         file-extension: json
 
-#定位刷新路由的配置文件,目前支持public域
+    gateway:
+      discovery:
+        locator:
+          lowerCaseServiceId: true
+          enabled: true
+
+# 定位刷新路由的配置文件,目前支持public域
 com:
   eagle:
     cloud:
@@ -27,6 +33,10 @@ com:
         nacos:
           listeningDateID: eagle-gateway-${spring.profiles.active}
           listeningGroup: Eagle
+
+        #  是否开启动态路由
+        dynamic:
+          enable: false
 
 management:
   endpoints:

@@ -1,10 +1,23 @@
 server:
-  port: 18004
+  port: 28006
 
 spring:
+
+  profiles:
+    active: dev
+
   application:
-    name: eagel-gateway
+    name: eagle-nacos
+
   cloud:
     nacos:
       discovery:
         server-addr: 192.168.9.166:8848
+      # server-addr: 127.0.0.1:8848
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" #暴露所有端点 默认是info,health

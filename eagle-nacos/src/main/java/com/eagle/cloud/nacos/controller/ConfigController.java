@@ -1,7 +1,7 @@
-package com.eagle.cloud.gateway.controller;
+package com.eagle.cloud.nacos.controller;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,14 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RefreshScope
 public class ConfigController {
     
-    @Value("${useLocalCache:false}")
-    private boolean useLocalCache;
     
     /**
      * http://localhost:8080/config/get
      */
-    @RequestMapping("/get")
-    public boolean get() {
-        return useLocalCache;
+    @GetMapping("/get")
+    public String get() {
+        return "useLocalCache";
     }
 }

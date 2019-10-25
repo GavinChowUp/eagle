@@ -27,25 +27,25 @@ import java.util.concurrent.Executor;
  */
 @Slf4j
 public class NacosRouteDefinitionRepository implements RouteDefinitionRepository {
-    
+
     private final String EAGLE_DATA_ID;
-    
+
     private final String EAGLE_GROUP_ID;
-    
+
     private ApplicationEventPublisher publisher;
-    
+
     private NacosConfigProperties nacosConfigProperties;
-    
+
     public NacosRouteDefinitionRepository(ApplicationEventPublisher publisher,
                                           NacosConfigProperties configProperties, EagleGatewayProp eagleGatewayProp) {
         this.publisher = publisher;
         this.nacosConfigProperties = configProperties;
-        
+
         EAGLE_DATA_ID = eagleGatewayProp.getNacos().getListeningDateID();
         EAGLE_GROUP_ID = eagleGatewayProp.getNacos().getListeningGroup();
         addListener();
     }
-    
+
     /**
      * 添加Nacos监听
      */
@@ -57,7 +57,6 @@ public class NacosRouteDefinitionRepository implements RouteDefinitionRepository
                         public Executor getExecutor() {
                             return null;
                         }
-                        
                         @Override
                         public void receiveConfigInfo(String configInfo) {
                             publisher.publishEvent(new RefreshRoutesEvent(this));
@@ -67,7 +66,7 @@ public class NacosRouteDefinitionRepository implements RouteDefinitionRepository
             log.error("nacos-addListener-error", e);
         }
     }
-    
+
     /**
      * 重写方法，实现路由信息读取
      *
@@ -75,36 +74,36 @@ public class NacosRouteDefinitionRepository implements RouteDefinitionRepository
      */
     @Override
     public Flux<RouteDefinition> getRouteDefinitions() {
-        
+
         try {
             log.info("【eagle gateway】start refresh routeDefinition...");
             String content = nacosConfigProperties.configServiceInstance()
                     .getConfig(EAGLE_DATA_ID, EAGLE_GROUP_ID, 5000);
-            
+
             List<RouteDefinition> routeDefinitions = getListByStr(content);
             log.info("【eagle gateway】success refresh routeDefinition...");
             return Flux.fromIterable(routeDefinitions);
-            
+
         } catch (NacosException e) {
             log.error("【eagle gateway】 getRouteDefinitions by nacos error", e);
         }
         return Flux.fromIterable(CollUtil.newArrayList());
     }
-    
+
     private List<RouteDefinition> getListByStr(String content) {
         if (StrUtil.isNotEmpty(content)) {
             return JSONObject.parseArray(content, RouteDefinition.class);
         }
         return new ArrayList<>(0);
     }
-    
+
     @Override
     public Mono<Void> save(Mono<RouteDefinition> route) {
-        return null;
+        return Mono.empty();
     }
-    
+
     @Override
     public Mono<Void> delete(Mono<String> routeId) {
-        return null;
+        return Mono.empty();
     }
 }

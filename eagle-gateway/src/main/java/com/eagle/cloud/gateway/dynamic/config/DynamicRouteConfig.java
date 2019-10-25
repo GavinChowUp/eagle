@@ -17,21 +17,21 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "com.eagle.cloud", name = "gateway.dynamic.enable", havingValue = "true",
         matchIfMissing = true)
 public class DynamicRouteConfig {
-    
+
     @Autowired
     private ApplicationEventPublisher publisher;
-    
+
     @Configuration
     @ConditionalOnProperty(prefix = "com.eagle.cloud", name = "gateway.dynamic.type", havingValue = "nacos",
             matchIfMissing = true)
     public class NacosDynRoute {
-        
+
         @Autowired
         private NacosConfigProperties nacosConfigProperties;
-    
+
         @Autowired
         EagleGatewayProp eagleGatewayProp;
-        
+
         @Bean
         public NacosRouteDefinitionRepository nacosRouteDefinitionRepository() {
             return new NacosRouteDefinitionRepository(publisher, nacosConfigProperties,eagleGatewayProp);
