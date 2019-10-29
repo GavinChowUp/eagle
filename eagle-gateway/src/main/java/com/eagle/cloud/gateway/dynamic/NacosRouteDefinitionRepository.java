@@ -6,7 +6,7 @@ import com.alibaba.cloud.nacos.NacosConfigProperties;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
-import com.eagle.cloud.gateway.properties.EagleGatewayProp;
+import com.eagle.cloud.gateway.dynamic.properties.EagleGatewayProp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.route.RouteDefinition;
@@ -40,7 +40,7 @@ public class NacosRouteDefinitionRepository implements RouteDefinitionRepository
                                           NacosConfigProperties configProperties, EagleGatewayProp eagleGatewayProp) {
         this.publisher = publisher;
         this.nacosConfigProperties = configProperties;
-
+    
         EAGLE_DATA_ID = eagleGatewayProp.getNacos().getListeningDateID();
         EAGLE_GROUP_ID = eagleGatewayProp.getNacos().getListeningGroup();
         addListener();
@@ -69,6 +69,7 @@ public class NacosRouteDefinitionRepository implements RouteDefinitionRepository
 
     /**
      * 重写方法，实现路由信息读取
+     * 该方法默认30秒执行一次
      *
      * @return
      */
@@ -76,12 +77,10 @@ public class NacosRouteDefinitionRepository implements RouteDefinitionRepository
     public Flux<RouteDefinition> getRouteDefinitions() {
 
         try {
-            log.info("【eagle gateway】start refresh routeDefinition...");
             String content = nacosConfigProperties.configServiceInstance()
                     .getConfig(EAGLE_DATA_ID, EAGLE_GROUP_ID, 5000);
 
             List<RouteDefinition> routeDefinitions = getListByStr(content);
-            log.info("【eagle gateway】success refresh routeDefinition...");
             return Flux.fromIterable(routeDefinitions);
 
         } catch (NacosException e) {

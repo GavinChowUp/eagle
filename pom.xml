@@ -12,7 +12,7 @@
         <module>eagle-common</module>
         <module>eagle-auth</module>
         <module>eagle-upms</module>
-        <module>eagle-nacos</module>
+        <module>eagle-demo</module>
         <module>eagle-gateway</module>
     </modules>
 

@@ -1,4 +1,4 @@
-package com.eagle.cloud.gateway.properties;
+package com.eagle.cloud.gateway.dynamic.properties;
 
 import lombok.Data;
 

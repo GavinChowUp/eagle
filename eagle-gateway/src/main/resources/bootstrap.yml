@@ -1,5 +1,5 @@
 server:
-  port: 28004
+  port: 18004
 
 spring:
 
@@ -9,6 +9,9 @@ spring:
   application:
     name: eagle-gateway
 
+  redis:
+    host: 192.168.9.167
+
   cloud:
     nacos:
       discovery:
@@ -17,7 +20,11 @@ spring:
 
       config:
         server-addr: ${spring.cloud.nacos.discovery.server-addr}
-        file-extension: json
+        file-extension: yml
+        group: Eagle
+        shared-dataids: eagle-common.yml
+        refreshable-dataids: eagle-common.yml
+
 
     gateway:
       discovery:
@@ -25,21 +32,34 @@ spring:
           lowerCaseServiceId: true
           enabled: true
 
-# 定位刷新路由的配置文件,目前支持public域
+# ---------------------------------------- #
+#            eagle 自定义配置               #
+# ---------------------------------------- #
 com:
   eagle:
     cloud:
       gateway:
         nacos:
-          listeningDateID: eagle-gateway-${spring.profiles.active}
+          # 定位刷新路由的配置文件,目前支持public域
+          listeningDateID: eagle-gateway-${spring.profiles.active}.json
           listeningGroup: Eagle
 
-        #  是否开启动态路由
+        # 是否开启动态路由
         dynamic:
           enable: false
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*" #暴露所有端点 默认是info,health
+      # 定义redis cachename 及过期时间
+      redis:
+        cache-map:
+          eagle-test1: 15
+          eagle-test2: 20
+
+      validate:
+        image:
+          weight: 90
+          height: 25
+          length: 3
+          interceptUrls:
+        sms:
+          length: 4
+          interceptUrls:

@@ -1,6 +1,6 @@
-package com.eagle.cloud.gateway.properties.config;
+package com.eagle.cloud.gateway.dynamic.config;
 
-import com.eagle.cloud.gateway.properties.EagleGatewayProp;
+import com.eagle.cloud.gateway.dynamic.properties.EagleGatewayProp;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,5 +10,5 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties(EagleGatewayProp.class)
-public class GatewayPropConfig {
+public class GatewayPropConfiguration {
 }
