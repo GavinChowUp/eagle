@@ -17,7 +17,6 @@ public class ValidataCodeProcessorHolder {
     @Autowired
     Map<String, ICodeProcessor> iCodeProcessors;
     
-    
     public ICodeProcessor getProcessor(String type) throws ValidateCodeException {
         
         String name = type + "CodeProcessor";

@@ -1,11 +1,11 @@
 package com.eagle.cloud.gateway.validate.processor;
 
 import com.eagle.cloud.gateway.validate.ICodeProcessor;
-import com.eagle.cloud.gateway.validate.constant.ValidateConstant;
 import com.eagle.cloud.gateway.validate.exception.ValidateCodeException;
 import com.eagle.cloud.gateway.validate.generater.ICodeGenerater;
-import com.eagle.cloud.gateway.validate.pojo.VerificationCode;
 import com.eagle.cloud.gateway.validate.properties.ValidateCodeProperties;
+import com.eagle.cloud.gateway.validate.constant.ValidateConstant;
+import com.eagle.cloud.gateway.validate.pojo.VerificationCode;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

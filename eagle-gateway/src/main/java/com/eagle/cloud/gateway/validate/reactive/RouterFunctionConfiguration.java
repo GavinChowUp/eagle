@@ -15,9 +15,10 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 
 /**
- * 路由配置信息
- * <p>
- * 需呀注意，reactive 不能提高浏览器的响应时间，但是大大提高了后端的可伸缩性
+ * 需要注意，reactive 不能提高浏览器的响应时间，但是大大提高了后端的可伸缩性
+ *
+ * @author Gavin
+ * @date 2019/10/29 7:10 下午
  */
 @Slf4j
 @Configuration
@@ -31,8 +32,9 @@ public class RouterFunctionConfiguration {
     public RouterFunction<ServerResponse> routerFunction() {
         return RouterFunctions.nest(
                 RequestPredicates.path("/code"),
-                RouterFunctions.route(RequestPredicates.GET("/{type}").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)),
-                        validateCodeHandler::handle)
+                RouterFunctions.route(
+                        RequestPredicates.GET("/{type}")
+                                .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), validateCodeHandler::handle)
         );
     }
     

@@ -17,7 +17,6 @@ import java.util.Map;
  * @author Gavin
  * @date 2019/10/29 5:10 下午
  */
-
 @Slf4j
 @Configuration
 public class ValidateCodeHandler implements HandlerFunction<ServerResponse> {
