@@ -14,6 +14,8 @@ public class ValidateCodeProperties {
     public final String AUTHENTICATION_FORM = "/authentication/form";
     public final String AUTHENTICATION_MOBILE = "/authentication/mobile";
     
+    
+    
     private ImageCodeProperties image = new ImageCodeProperties();
     private SmsCodeProperties sms = new SmsCodeProperties();
     

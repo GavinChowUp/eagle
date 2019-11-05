@@ -8,7 +8,6 @@ import com.google.code.kaptcha.Producer;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.reactive.function.server.ServerRequest;
 
 import java.awt.image.BufferedImage;
 
@@ -28,7 +27,7 @@ public class ImageCodeGenerater implements ICodeGenerater {
     
     
     @Override
-    public ImageCode generateCode(ServerRequest request) {
+    public ImageCode generateCode() {
         
         //生成验证码
         String text = producer.createText();

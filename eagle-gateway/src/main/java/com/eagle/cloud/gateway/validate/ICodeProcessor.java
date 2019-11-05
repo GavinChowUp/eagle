@@ -1,10 +1,8 @@
 package com.eagle.cloud.gateway.validate;
 
 import com.eagle.cloud.gateway.validate.exception.ValidateCodeException;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
+import org.springframework.web.bind.ServletRequestBindingException;
+import org.springframework.web.context.request.ServletWebRequest;
 
 import java.io.IOException;
 
@@ -24,12 +22,13 @@ public interface ICodeProcessor {
      * @param request
      * @return
      */
-    Mono<ServerResponse> processCode(ServerRequest request) throws ValidateCodeException, IOException;
+    void processCode(ServletWebRequest request) throws ValidateCodeException, IOException,
+            ServletRequestBindingException;
     
     /**
      * 验证码校验逻辑
      *
      * @param request
      */
-    void validataCode(ServerHttpRequest request) throws ValidateCodeException;
+    void validataCode(ServletWebRequest request) throws ValidateCodeException, ServletRequestBindingException;
 }

@@ -1,7 +1,6 @@
 package com.eagle.cloud.gateway.validate.generater;
 
 import com.eagle.cloud.gateway.validate.pojo.VerificationCode;
-import org.springframework.web.reactive.function.server.ServerRequest;
 
 /**
  * 验证码生成器接口
@@ -11,5 +10,5 @@ import org.springframework.web.reactive.function.server.ServerRequest;
  */
 public interface ICodeGenerater {
     
-    VerificationCode generateCode(ServerRequest request);
+    VerificationCode generateCode();
 }

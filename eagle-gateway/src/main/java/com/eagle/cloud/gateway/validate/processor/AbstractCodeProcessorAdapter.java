@@ -1,18 +1,17 @@
 package com.eagle.cloud.gateway.validate.processor;
 
 import com.eagle.cloud.gateway.validate.ICodeProcessor;
+import com.eagle.cloud.gateway.validate.constant.ValidateConstant;
 import com.eagle.cloud.gateway.validate.exception.ValidateCodeException;
 import com.eagle.cloud.gateway.validate.generater.ICodeGenerater;
-import com.eagle.cloud.gateway.validate.properties.ValidateCodeProperties;
-import com.eagle.cloud.gateway.validate.constant.ValidateConstant;
 import com.eagle.cloud.gateway.validate.pojo.VerificationCode;
+import com.eagle.cloud.gateway.validate.properties.ValidateCodeProperties;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
+import org.springframework.web.bind.ServletRequestBindingException;
+import org.springframework.web.bind.ServletRequestUtils;
+import org.springframework.web.context.request.ServletWebRequest;
 
 import java.io.IOException;
 import java.util.Map;
@@ -38,24 +37,25 @@ public abstract class AbstractCodeProcessorAdapter<T extends VerificationCode> i
     Map<String, ICodeGenerater> iCodeGeneraterMap;
     
     @Override
-    public Mono<ServerResponse> processCode(ServerRequest request) throws IOException, ValidateCodeException {
+    public void processCode(ServletWebRequest request) throws IOException, ValidateCodeException,
+            ServletRequestBindingException {
         
         T verificationCode = generater(request);
         saveCode(request, verificationCode);
-        return sendCode(request, verificationCode);
+        sendCode(request, verificationCode);
         
     }
     
     
     @Override
-    public void validataCode(ServerHttpRequest request) throws ValidateCodeException {
+    public void validataCode(ServletWebRequest request) throws ValidateCodeException, ServletRequestBindingException {
         
         String type = StringUtils.substringBefore(getClass().getSimpleName(), "CodeProcessor").toLowerCase();
-        String randomStr = request.getQueryParams().getFirst("randomStr");
+        String randomStr = ServletRequestUtils.getRequiredStringParameter(request.getRequest(), "randomStr");
         
         String codeInStore = stringRedisTemplate.opsForValue().get(randomStr);
         
-        String codeInRequest = request.getQueryParams().getFirst(type + "Code");
+        String codeInRequest = ServletRequestUtils.getRequiredStringParameter(request.getRequest(), type + "Code");
         
         if (StringUtils.isBlank(codeInRequest)) {
             stringRedisTemplate.delete(randomStr);
@@ -80,9 +80,11 @@ public abstract class AbstractCodeProcessorAdapter<T extends VerificationCode> i
      * @param request
      * @param verificationCode
      */
-    private void saveCode(ServerRequest request, T verificationCode) {
-        stringRedisTemplate.opsForValue().set(DEFAULT_CODE_KEY + request.queryParams().getFirst("randomStr"),
-                verificationCode.getCode(), validateCodeProperties.getImage().getExpirationTime());
+    private void saveCode(ServletWebRequest request, T verificationCode) throws ServletRequestBindingException {
+        stringRedisTemplate.opsForValue()
+                .set(DEFAULT_CODE_KEY + ServletRequestUtils.getRequiredStringParameter(request.getRequest(), "randomStr"),
+                        verificationCode.getCode(),
+                        validateCodeProperties.getImage().getExpirationTime());
     }
     
     /**
@@ -92,11 +94,11 @@ public abstract class AbstractCodeProcessorAdapter<T extends VerificationCode> i
      * @return
      */
     @SuppressWarnings("unchecked")
-    private T generater(ServerRequest request) {
+    private T generater(ServletWebRequest request) {
         
         String type = getProcessType(request);
         ICodeGenerater codeGenerater = iCodeGeneraterMap.get(type + "CodeGenerater");
-        return (T) codeGenerater.generateCode(request);
+        return (T) codeGenerater.generateCode();
         
     }
     
@@ -106,9 +108,10 @@ public abstract class AbstractCodeProcessorAdapter<T extends VerificationCode> i
      * @param request
      * @return
      */
-    private String getProcessType(ServerRequest request) {
+    private String getProcessType(ServletWebRequest request) {
         
-        return StringUtils.substringAfter(request.uri().getPath(), ValidateConstant.CODE_TYPE_SEP);
+        return StringUtils.substringAfter(request.getRequest().getRequestURI(), ValidateConstant.CODE_TYPE_SEP);
+        
         
     }
     
@@ -119,7 +122,7 @@ public abstract class AbstractCodeProcessorAdapter<T extends VerificationCode> i
      * @param verificationCode
      * @return
      */
-    protected abstract Mono<ServerResponse> sendCode(ServerRequest request, T verificationCode) throws IOException,
-            ValidateCodeException;
+    protected abstract void sendCode(ServletWebRequest request, T verificationCode) throws IOException,
+            ValidateCodeException, ServletRequestBindingException;
     
 }

@@ -1,8 +1,5 @@
 package com.eagle.cloud.gateway.validate.sender;
 
-import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
-
 /**
  * 验证码发送接口
  *
@@ -11,5 +8,5 @@ import reactor.core.publisher.Mono;
  */
 public interface ICodeSender {
     
-    Mono<ServerResponse> sendCode(String sendTo, String sendValue);
+   void sendCode(String sendTo, String sendValue);
 }

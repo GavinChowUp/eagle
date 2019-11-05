@@ -7,24 +7,25 @@ import com.eagle.cloud.gateway.validate.ValidataCodeProcessorHolder;
 import com.eagle.cloud.gateway.validate.constant.ValidateConstant;
 import com.eagle.cloud.gateway.validate.exception.ValidateCodeException;
 import com.eagle.cloud.gateway.validate.properties.ValidateCodeProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
-import reactor.core.publisher.Mono;
+import org.springframework.web.bind.ServletRequestBindingException;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -37,7 +38,7 @@ import java.util.Set;
 @Data
 @Component
 @Slf4j
-public class ValidateCodeFilter extends AbstractGatewayFilterFactory implements InitializingBean {
+public class ValidateCodeFilter extends OncePerRequestFilter implements InitializingBean {
     
     @Autowired
     ValidateCodeProperties validateCodeProperties;
@@ -50,40 +51,44 @@ public class ValidateCodeFilter extends AbstractGatewayFilterFactory implements 
     
     private AntPathMatcher antPathMatcher = new AntPathMatcher();
     
-    private Map<String, String> validateUrlsWithType = new HashMap<>();
+    private Set<String> imageValidateUrls = new HashSet<>();
+    private Set<String> smsValidateUrls = new HashSet<>();
     
     
     @Override
     public void afterPropertiesSet() {
         
-        validateUrlsWithType.put(validateCodeProperties.AUTHENTICATION_FORM, ValidateConstant.CODE_TYPE_IMAGE);
-        addUrlsToMap(validateCodeProperties.getImage().getInterceptUrls(), ValidateConstant.CODE_TYPE_IMAGE);
+        imageValidateUrls.add(validateCodeProperties.AUTHENTICATION_FORM);
+        smsValidateUrls.add(validateCodeProperties.AUTHENTICATION_MOBILE);
         
-        validateUrlsWithType.put(validateCodeProperties.AUTHENTICATION_MOBILE, ValidateConstant.CODE_TYPE_SMS);
-        addUrlsToMap(validateCodeProperties.getSms().getInterceptUrls(), ValidateConstant.CODE_TYPE_SMS);
-        
+        addUrlsToSet(validateCodeProperties.getImage().getInterceptUrls(), imageValidateUrls);
+        addUrlsToSet(validateCodeProperties.getSms().getInterceptUrls(), smsValidateUrls);
         
     }
     
-    private void addUrlsToMap(String interceptUrls, String codeType) {
+    private void addUrlsToSet(String interceptUrls, Set<String> set) {
         
         String[] urls = StringUtils.splitByWholeSeparatorPreserveAllTokens(interceptUrls, ",");
         if (urls != null) {
             for (String url : urls) {
-                validateUrlsWithType.put(url, codeType);
+                set.add(url);
             }
         }
     }
     
     
-    private String getProcessorType(ServerHttpRequest request) {
+    private String getProcessorType(HttpServletRequest request) {
         
-        if (StringUtils.equalsIgnoreCase(request.getMethodValue(), "post")) {
-            Set<String> urls = validateUrlsWithType.keySet();
+        if (StringUtils.equalsIgnoreCase(request.getMethod(), "post")) {
             
-            for (String url : urls) {
-                if (antPathMatcher.match(url, request.getURI().getPath())) {
-                    return validateUrlsWithType.get(url);
+            for (String url : imageValidateUrls) {
+                if (antPathMatcher.match(url, request.getRequestURI())) {
+                    return ValidateConstant.CODE_TYPE_IMAGE;
+                }
+            }
+            for (String url : smsValidateUrls) {
+                if (antPathMatcher.match(url, request.getRequestURI())) {
+                    return ValidateConstant.CODE_TYPE_SMS;
                 }
             }
         }
@@ -91,36 +96,49 @@ public class ValidateCodeFilter extends AbstractGatewayFilterFactory implements 
         return null;
     }
     
+    
     @Override
-    public GatewayFilter apply(Object config) {
-        return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
-            
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+        
+        if (doUrlValidate(request)) {
             String type = getProcessorType(request);
             
             if (type != null) {
                 try {
                     ICodeProcessor processor = processorHolder.getProcessor(type);
-                    log.info("当前的请求是：" + request.getURI().getPath() + " 获取的processor 是" +
+                    log.info("当前的请求是：" + request.getRequestURI() + " 获取的processor 是" +
                             processor.getClass().getSimpleName() + ",验证码类型是： " + type);
                     
-                    processor.validataCode(request);
-                } catch (ValidateCodeException e) {
-                    ServerHttpResponse response = exchange.getResponse();
-                    response.setStatusCode(HttpStatus.PRECONDITION_REQUIRED);
-                    try {
-                        return response.writeWith(Mono.just(
-                                response.bufferFactory().wrap(objectMapper.writeValueAsBytes(
-                                        R.builder().build().fail("验证码校验失败", e.getMessage())))));
-                    } catch (JsonProcessingException e1) {
-                        e1.printStackTrace();
-                    }
-                    return response.setComplete();
+                    processor.validataCode(new ServletWebRequest(request));
+                } catch (ValidateCodeException | ServletRequestBindingException e) {
+                    response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                    response.setContentType("application/json;charset=utf-8");
+                    response.getWriter().write(objectMapper.writeValueAsString(R.builder().build().fail(null, e.getMessage())));
+                    return;
                 }
+            } else {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setContentType("application/json;charset=utf-8");
+                response.getWriter().write(objectMapper.writeValueAsString(R.builder().build().fail("validate",
+                        "该请求路径需校验验证码：" + request.getRequestURI())));
+                return;
             }
-            
-            return chain.filter(exchange);
-        };
+        }
+        filterChain.doFilter(request, response);
+    }
+    
+    private boolean doUrlValidate(HttpServletRequest request) {
         
+        for (String url : imageValidateUrls) {
+            if (antPathMatcher.match(url, request.getRequestURI())) {
+                return true;
+            }
+        }
+        for (String url : smsValidateUrls) {
+            if (antPathMatcher.match(url, request.getRequestURI())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

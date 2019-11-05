@@ -1,15 +1,13 @@
 package com.eagle.cloud.gateway.validate.processor;
 
 
-import com.eagle.cloud.gateway.validate.exception.ValidateCodeException;
 import com.eagle.cloud.gateway.validate.pojo.VerificationCode;
 import com.eagle.cloud.gateway.validate.sender.ICodeSender;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
+import org.springframework.web.bind.ServletRequestBindingException;
+import org.springframework.web.bind.ServletRequestUtils;
+import org.springframework.web.context.request.ServletWebRequest;
 
 /**
  * @author: Gavin
@@ -22,14 +20,11 @@ public class SmsCodeProcessor extends AbstractCodeProcessorAdapter<VerificationC
     ICodeSender smsCodeSender;
     
     @Override
-    protected Mono<ServerResponse> sendCode(ServerRequest request,
-                                            VerificationCode verificationCode) throws ValidateCodeException {
-        
-        String mobile = request.queryParams().getFirst("mobile");
-        if (StringUtils.isBlank(mobile)) {
-            throw new ValidateCodeException("手机号不能为空");
-        }
-        
-        return smsCodeSender.sendCode(mobile, verificationCode.getCode());
+    protected void sendCode(ServletWebRequest request,
+                            VerificationCode verificationCode) throws ServletRequestBindingException {
+    
+        String mobile = ServletRequestUtils.getRequiredStringParameter(request.getRequest(),"mobile");
+    
+        smsCodeSender.sendCode(mobile, verificationCode.getCode());
     }
 }

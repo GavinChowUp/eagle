@@ -25,13 +25,6 @@ spring:
         shared-dataids: eagle-common.yml
         refreshable-dataids: eagle-common.yml
 
-
-    gateway:
-      discovery:
-        locator:
-          lowerCaseServiceId: true
-          enabled: true
-
 # ---------------------------------------- #
 #            eagle 自定义配置               #
 # ---------------------------------------- #
@@ -59,7 +52,8 @@ com:
           weight: 90
           height: 25
           length: 3
-          interceptUrls:
+          #注意 区别/* (单级) 和 /**(多级)
+          interceptUrls: /hello
         sms:
           length: 4
           interceptUrls:

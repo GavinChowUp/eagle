@@ -15,7 +15,6 @@ import java.util.Date;
 @Builder
 public class R {
     
-    private final String SUCCESS_CODE = "000000";
     
     private String code;
     
@@ -26,21 +25,21 @@ public class R {
     private Object resultBody;
     
     public R ok(Object resultBody) {
-        this.code = SUCCESS_CODE;
+        this.code = "request_success";
         this.resultBody = resultBody;
         this.date = new Date();
         return this;
     }
     
     public R fail(String code, String msg) {
-        this.code = code;
+        this.code = "request_fail:" + code;
         this.msg = msg;
         this.date = new Date();
         return this;
     }
     
     public R fail(String code) {
-        this.code = code;
+        this.code = "request_fail:" + code;
         this.date = new Date();
         return this;
     }

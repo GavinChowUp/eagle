@@ -7,7 +7,6 @@ import com.eagle.cloud.gateway.validate.properties.ValidateCodeProperties;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.server.ServerRequest;
 
 /**
  * @author: Gavin
@@ -20,7 +19,7 @@ public class SmsCodeGenerater implements ICodeGenerater {
     private ValidateCodeProperties validateCodeProperties;
     
     @Override
-    public VerificationCode generateCode(ServerRequest request) {
+    public VerificationCode generateCode() {
         String code = RandomStringUtils.randomNumeric(validateCodeProperties.getSms().getLength());
         return new VerificationCode(code, validateCodeProperties.getSms().getExpirationTime());
     }
