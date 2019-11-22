@@ -3,11 +3,13 @@ package com.eagle.cloud.gateway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 
 /**
  * @author Gavin
  * @date 2019/10/22 8:53 下午
  */
+@EnableZuulProxy
 @SpringBootApplication
 @EnableDiscoveryClient
 public class GatewayApplication {

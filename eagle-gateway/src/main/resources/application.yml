@@ -1,0 +1,8 @@
+# zuul 静态网关配置
+
+zuul:
+  routes:
+    demo:
+      path: /demo/**
+      service-id: eagle-demo
+      strip-prefix: true

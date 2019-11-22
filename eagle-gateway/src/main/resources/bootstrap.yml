@@ -39,7 +39,7 @@ com:
 
         # 是否开启动态路由
         dynamic:
-          enable: false
+          enable: true
 
       # 定义redis cachename 及过期时间
       redis:

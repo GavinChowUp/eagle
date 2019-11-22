@@ -7,7 +7,7 @@ spring:
     active: dev
 
   application:
-    name: eagle-nacos
+    name: eagle-demo
 
   cloud:
     nacos:
