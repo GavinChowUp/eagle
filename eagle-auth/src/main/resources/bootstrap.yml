@@ -1,0 +1,23 @@
+server:
+  port: 18003
+
+spring:
+
+  profiles:
+    active: dev
+
+  application:
+    name: eagle-auth
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.9.166:8848
+      # server-addr: 127.0.0.1:8848
+
+      config:
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+        file-extension: yml
+        group: Eagle
+        shared-dataids: eagle-common.yml
+        refreshable-dataids: eagle-common.yml

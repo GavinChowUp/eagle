@@ -2,7 +2,13 @@
 
 zuul:
   routes:
+    auth:
+      path: /auth/**
+      service-id: eagle-auth
+      strip-prefix: true
+      sensitive-headers:
     demo:
       path: /demo/**
       service-id: eagle-demo
       strip-prefix: true
+      sensitive-headers:
